@@ -1,0 +1,138 @@
+public class Sudoku {
+	public static void main(String[] args) {
+		Sudoku sudoku = new Sudoku();
+		String difficulty = "Easy";
+		if (sudoku.fillBoard()) {
+			sudoku.printBoard("Test");
+			sudoku.printBoard("Easy");
+			sudoku.printBoard("Medium");
+			sudoku.printBoard("Hard");
+		}
+
+	}
+
+	private int[][] board;
+	private int size;
+
+	public Sudoku() {
+		board = new int[9][9];
+		size = 9;
+	}
+
+	public boolean fillBoard() {
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[0].length; j++) {
+				//keep track of where you start, so you know when you loop back to where you started
+				int original = (int) (Math.random() * size) + 1;
+				int choice = original;
+				while (true) {
+					if (choice != 0 && validRow(choice, i) && validCol(choice, j) && validGroup(choice, i, j)) {
+						board[i][j] = choice;
+						break;
+					}
+					//if this solution didn't work, increase it by one (wrapping around at 9)
+					choice = (choice + 1) % (size + 1);
+					
+					//if you loop all the way around, you've written yourself into a corner. The board is impossible to solve
+					//Restart the process by recursively calling the board
+					if(choice == original) {
+						board = new int[size][size];
+						return fillBoard();
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	//looks at the given row and returns false if the given value is already found there
+	public boolean validRow(int val, int row) {
+		for (int i = 0; i < board[0].length; i++) {
+			if (board[row][i] == val)
+				return false;
+		}
+		return true;
+	}
+
+	//looks at the given col and returns false if the given value is already found there
+	public boolean validCol(int val, int col) {
+		for (int i = 0; i < board.length; i++) {
+			if (board[i][col] == val)
+				return false;
+		}
+		return true;
+	}
+
+
+	//looks at the given 3x3 group and returns false if the given value is already found there
+	public boolean validGroup(int val, int row, int col) {
+		//find the top left corner of the 3x3 group
+		int startRow = 3 * (row / 3);
+		int startCol = 3 * (col / 3);
+
+		//check every element in the 3x3 grid for the value
+		for (int i = startRow; i < startRow + 3; i++) {
+			for (int j = startCol; j < startCol + 3; j++) {
+				if (board[i][j] == val)
+					return false;
+			}
+		}
+		return true;
+	}
+
+	public void printBoard(String dif) {
+		double prob;
+		if (dif.equals("Easy")) {
+			prob = .44;
+		} else if (dif.equals("Medium")) {
+			prob = .38;
+		} else if (dif.equals("Hard")) {
+			prob = .30;
+		} else if (dif.equals("Test")) {
+			prob = 1.0;
+		} else {
+			System.out.println("Invalid difficulty.");
+			return;
+		}
+
+		//copy the board with a deep copy
+		int[][] copy = new int[size][size];
+		for (int i = 0; i < copy.length; i++) {
+			for (int j = 0; j < copy.length; j++) {
+				copy[i][j] = board[i][j];
+			}
+		}
+		//System.out.println(Arrays.deepToString(copy));
+		
+		
+		//each value has a prob percent chance of remaining visible
+		for (int i = 0; i < copy.length; i++) {
+			for (int j = 0; j < copy[0].length; j++) {
+				if (Math.random() > prob) {
+					copy[i][j] = 0;
+				}
+			}
+		}
+
+		System.out.println(" ----------------------- ");
+		for (int i = 0; i < copy.length; i++) {
+			if(i != 0 && i % 3 == 0) {
+				System.out.println(" ----------------------- ");
+			}
+			System.out.print("| ");
+			for (int j = 0; j < copy[0].length; j++) {
+				if (j != 0 && j % 3 ==0) {
+					System.out.print("| ");
+				}
+				if (copy[i][j] == 0) {
+					System.out.print("  ");
+				} else {
+					System.out.print(copy[i][j] + " ");
+				}
+			}
+			System.out.println("| ");
+		}
+		System.out.println(" ----------------------- ");
+
+	}
+}
