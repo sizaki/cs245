@@ -1,0 +1,13 @@
+public class Person {
+	public String state;
+	public String name;
+	public int age;
+	public String gender;
+
+	public Person(String state, String name, int age, String gender) {
+		this.state = state;
+		this.name = name;
+		this.age = age;
+		this.gender = gender;
+	}
+}
